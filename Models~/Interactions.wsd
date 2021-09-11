@@ -1,0 +1,22 @@
+@startuml Interactions
+!theme sketchy-outline
+
+interface Interactions.IInteractable
+Interactions.IInteractable : ~Interact()
+
+interface Interactions.IInteractor
+
+
+Interactions.Button .. Interactions.IInteractable : Interact
+note on link #black: note
+Interactions.Button .. Interactions.IInteractor
+
+
+class Interactions.Button << (M,green) >>{
+ -field1
+ #field2
+ ~method1()
+ +method2()
+}
+
+@enduml

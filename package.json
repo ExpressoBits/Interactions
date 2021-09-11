@@ -1,0 +1,22 @@
+{
+    "name": "br.com.expressobits.interactions",
+    "displayName": "EB Interactions",
+    "version": "0.1.0-preview",
+    "unity": "2020.3",
+    "description": "Interactions system for unity first/third person",
+    "keywords": [
+        "gameplay"
+    ],
+    "author": {
+        "name": "Expresso Bits"
+    },
+    "license": "MIT",
+    "homepage": "https://github.com/ExpressoBits/Interactions",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ExpressoBits/Interactions.git"
+    },
+    "bugs": {
+        "url": "https://github.com/ExpressoBits/Interactions/issues"
+    }
+}

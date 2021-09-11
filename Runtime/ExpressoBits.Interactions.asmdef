@@ -1,0 +1,14 @@
+{
+    "name": "ExpressoBits.Interactions",
+    "rootNamespace": "ExpressoBits.Interactions",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
