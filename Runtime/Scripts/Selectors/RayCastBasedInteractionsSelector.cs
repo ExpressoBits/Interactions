@@ -4,9 +4,12 @@ namespace ExpressoBits.Interactions
 {
     public class RayCastBasedInteractionsSelector : MonoBehaviour, ISelector
     {
-        private Transform selection;
 
-        public float maxDistanceToSelect = 1.5f;
+        public Transform Selection => selection;
+        
+        private Transform selection;
+        [Range(0.1f,10f)]
+        [SerializeField] private float maxDistanceToSelect = 1.5f;
 
         public void Check(Ray ray)
         {
@@ -14,17 +17,12 @@ namespace ExpressoBits.Interactions
             if (Physics.Raycast(ray, out var hit, maxDistanceToSelect))
             {
                 var selection = hit.transform;
-                IInteractable interaction = selection.GetComponent<IInteractable>();
-                if (interaction != null)
+                if(selection.TryGetComponent(out IInteractable interactable))
                 {
                     this.selection = selection;
                 }
             }
         }
 
-        public Transform GetSelection()
-        {
-            return selection;
-        }
     }
 }
