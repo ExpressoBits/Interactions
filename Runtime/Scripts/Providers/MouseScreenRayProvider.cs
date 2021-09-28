@@ -4,9 +4,10 @@ namespace ExpressoBits.Interactions
 {
     public class MouseScreenRayProvider : MonoBehaviour, IRayProvider
     {
+
         public Ray CreateRay()
         {
-            return Camera.main.ScreenPointToRay(Input.mousePosition);
+            return Camera.main.ScreenPointToRay(Input.mousePosition);;
         }
     }
 }

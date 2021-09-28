@@ -21,6 +21,8 @@ namespace ExpressoBits.Interactions
                 {
                     this.selection = selection;
                 }
+
+                Debug.DrawLine(ray.origin,hit.point,Color.yellow);
             }
         }
 

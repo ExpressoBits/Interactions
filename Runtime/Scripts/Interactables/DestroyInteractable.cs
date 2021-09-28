@@ -6,12 +6,18 @@ namespace ExpressoBits.Interactions.Interactables
     {
         private const string PriviewMessage = "for Destroy Object";
 
+        public GameObject[] instantiateInDestroy;
+
         public void Interact()
         {
             Destroy(gameObject);
+            foreach(GameObject go in instantiateInDestroy)
+            {
+                Instantiate(go,transform.position,transform.rotation);
+            }
         }
 
-        public string Preview()
+        public string PreviewMessage()
         {
             return PriviewMessage;
         }

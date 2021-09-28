@@ -2,7 +2,7 @@ namespace ExpressoBits.Interactions
 {
     public interface IPreviewInteract
     {
-        string Preview();
+        string PreviewMessage();
     }
 }
 
