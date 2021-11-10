@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace ExpressoBits.Interactions
@@ -18,6 +19,8 @@ namespace ExpressoBits.Interactions
         public static NewSelectionEvent OnAnyNewSelectionEvent;
         public static PreviewEvent OnAnyPreviewEvent;
 
+        public Action<Transform> OnInteract;
+
         [SerializeField] private string defaultPreviewMessage = "for Interact";
 
         private void Awake()
@@ -35,13 +38,6 @@ namespace ExpressoBits.Interactions
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                // FIXME if interact destroy object current selection no update
-                Interact();
-                UpdateSelection(null);
-                return;
-            }
             selector.Check(rayProvider.CreateRay());
             var selection = selector.Selection;
             if (IsNewSelection(selection))
@@ -78,12 +74,19 @@ namespace ExpressoBits.Interactions
             currentSelection = selection;
         }
 
-        public void Interact()
+        private void InteractWithObject()
         {
             if (interactable != null)
             {
+                OnInteract?.Invoke(interactable.Transform);
                 interactable?.Interact();
             }
+        }
+
+        public void Interact()
+        {
+            InteractWithObject();
+            UpdateSelection(null);
         }
 
         private bool IsNewSelection(Transform selection)

@@ -8,6 +8,8 @@ namespace ExpressoBits.Interactions.Interactables
 
         public GameObject[] instantiateInDestroy;
 
+        public Transform Transform => transform;
+
         public void Interact()
         {
             Destroy(gameObject);

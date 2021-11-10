@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace ExpressoBits.Interactions
 {
     /// <summary>
@@ -5,6 +7,7 @@ namespace ExpressoBits.Interactions
     /// </summary>
     public interface IInteractable
     {
+        Transform Transform { get; }
         void Interact();
     }
 }
