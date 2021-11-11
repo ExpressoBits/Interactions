@@ -10,14 +10,14 @@ namespace ExpressoBits.Interactions
 
         private Dictionary<Renderer,Material[]> selectionMaterials = new Dictionary<Renderer, Material[]>();
 
-        public void OnSelect(Transform selection)
+        public void OnSelect(IInteractable interactable)
         {
-            ChangeMaterials(selection);
+            ChangeMaterials(interactable.Transform);
         }
 
-        public void OnDeselect(Transform selection)
+        public void OnDeselect(IInteractable interactable)
         {
-            RestoreMaterials(selection);
+            RestoreMaterials(interactable.Transform);
         }
 
         private void RestoreMaterials(Transform selection)

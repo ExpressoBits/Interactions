@@ -4,7 +4,7 @@ namespace ExpressoBits.Interactions
 {
     public interface ISelector
     {
-        Transform Selection { get; }
+        IInteractable Selection { get; }
         void Check(Ray ray);
     }
 }

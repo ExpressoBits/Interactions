@@ -5,9 +5,9 @@ namespace ExpressoBits.Interactions
     public class RayCastBasedInteractionsSelector : MonoBehaviour, ISelector
     {
 
-        public Transform Selection => selection;
+        public IInteractable Selection => selection;
         
-        private Transform selection;
+        private IInteractable selection;
         [Range(0.1f,10f)]
         [SerializeField] private float maxDistanceToSelect = 1.5f;
 
@@ -16,10 +16,9 @@ namespace ExpressoBits.Interactions
             selection = null;
             if (Physics.Raycast(ray, out var hit, maxDistanceToSelect))
             {
-                var selection = hit.transform;
-                if(selection.TryGetComponent(out IInteractable interactable))
+                if(hit.transform.TryGetComponent(out IInteractable interactable))
                 {
-                    this.selection = selection;
+                    this.selection = interactable;
                 }
             }
         }

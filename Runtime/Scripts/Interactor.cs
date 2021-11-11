@@ -6,20 +6,20 @@ namespace ExpressoBits.Interactions
     public class Interactor : MonoBehaviour
     {
 
-        private Transform currentSelection;
-        private IInteractable interactable;
+        private IInteractable currentSelection;
         private IRayProvider rayProvider;
         private ISelector selector;
         private ISelectionResponse[] responses;
+        private bool requestInteraction;
 
-        public delegate void NewSelectionEvent(Transform newSelection);
+        public delegate void NewSelectionEvent(IInteractable newSelection);
         public delegate void PreviewEvent(string message);
 
         public NewSelectionEvent OnNewSelectionEvent;
         public static NewSelectionEvent OnAnyNewSelectionEvent;
         public static PreviewEvent OnAnyPreviewEvent;
 
-        public Action<Transform> OnInteract;
+        public Action<IInteractable> OnInteract;
 
         [SerializeField] private string defaultPreviewMessage = "for Interact";
 
@@ -38,61 +38,66 @@ namespace ExpressoBits.Interactions
 
         private void Update()
         {
-            selector.Check(rayProvider.CreateRay());
-            var selection = selector.Selection;
-            if (IsNewSelection(selection))
+            if (requestInteraction)
             {
-                UpdateSelection(selection);
-            }
-        }
-
-        private void UpdateSelection(Transform selection)
-        {
-            if (currentSelection != null)
-                foreach (var response in responses) response.OnDeselect(currentSelection);
-            if (selection != null)
-                foreach (var response in responses) response.OnSelect(selection);
-
-            if (selection != null && selection.TryGetComponent(out IInteractable interactable))
-            {
-                this.interactable = interactable;
-                if (selection.TryGetComponent(out IPreviewInteract preview))
-                {
-                    OnAnyPreviewEvent?.Invoke(preview.PreviewMessage());
-                }
-                else
-                {
-                    OnAnyPreviewEvent?.Invoke(defaultPreviewMessage);
-                }
+                InteractWithObject();
+                UpdateSelection(null);
             }
             else
             {
-                this.interactable = null;
+                selector.Check(rayProvider.CreateRay());
+                var selection = selector.Selection;
+                if (IsNewSelection(selection))
+                {
+                    UpdateSelection(selection);
+                }
             }
-            OnNewSelectionEvent?.Invoke(selection);
+            requestInteraction = false;
+        }
+
+        private void UpdateSelection(IInteractable selection)
+        {
+            if (currentSelection != null && currentSelection.Transform && currentSelection.Transform != null)
+                foreach (var response in responses) response.OnDeselect(currentSelection);
+            if (selection != null && selection.Transform && selection.Transform != null)
+                foreach (var response in responses) response.OnSelect(selection);
+
+            if (selection != null && selection.Transform.TryGetComponent(out IPreviewInteract preview))
+            {
+                OnAnyPreviewEvent?.Invoke(preview.PreviewMessage());
+            }
+            else
+            {
+                OnAnyPreviewEvent?.Invoke(defaultPreviewMessage);
+            }
+            if (selection != null) OnNewSelectionEvent?.Invoke(selection);
             OnAnyNewSelectionEvent?.Invoke(selection);
             currentSelection = selection;
         }
 
         private void InteractWithObject()
         {
-            if (interactable != null)
+            if (currentSelection != null && currentSelection.Transform && currentSelection.Transform != null)
             {
-                OnInteract?.Invoke(interactable.Transform);
-                interactable?.Interact();
+                OnInteract?.Invoke(currentSelection);
+                currentSelection?.Interact();
+                currentSelection = null;
+            }
+            else
+            {
+                currentSelection = null;
             }
         }
 
+        
         public void Interact()
         {
-            InteractWithObject();
-            UpdateSelection(null);
+            requestInteraction = true;
         }
 
-        private bool IsNewSelection(Transform selection)
+        private bool IsNewSelection(IInteractable selection)
         {
             return currentSelection != selection;
         }
-
     }
 }
