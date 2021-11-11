@@ -8,7 +8,6 @@ namespace ExpressoBits.Interactions
 
         private IInteractable currentSelection;
         private IRayProvider rayProvider;
-        private ISelector selector;
         private ISelectionResponse[] responses;
         private bool requestInteraction;
 
@@ -22,16 +21,14 @@ namespace ExpressoBits.Interactions
         public Action<IInteractable> OnInteract;
 
         [SerializeField] private string defaultPreviewMessage = "for Interact";
+        [SerializeField] private Selector selector;
+        [SerializeField] private SelectionResponse[] selectionResponses;
 
         private void Awake()
         {
             if (TryGetComponent(out IRayProvider rayProvider))
             {
                 this.rayProvider = rayProvider;
-            }
-            if (TryGetComponent(out ISelector selector))
-            {
-                this.selector = selector;
             }
             responses = GetComponents<ISelectionResponse>();
         }
@@ -58,10 +55,17 @@ namespace ExpressoBits.Interactions
         private void UpdateSelection(IInteractable selection)
         {
             if (currentSelection != null && currentSelection.Transform && currentSelection.Transform != null)
+            {
                 foreach (var response in responses) response.OnDeselect(currentSelection);
+                foreach (var response in selectionResponses) response.OnDeselect(currentSelection);
+            }
+                
             if (selection != null && selection.Transform && selection.Transform != null)
+            {
                 foreach (var response in responses) response.OnSelect(selection);
-
+                foreach (var response in selectionResponses) response.OnSelect(selection);
+            }
+            
             if (selection != null && selection.Transform.TryGetComponent(out IPreviewInteract preview))
             {
                 OnAnyPreviewEvent?.Invoke(preview.PreviewMessage());

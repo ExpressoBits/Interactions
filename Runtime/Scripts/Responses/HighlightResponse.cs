@@ -3,19 +3,19 @@ using UnityEngine;
 
 namespace ExpressoBits.Interactions
 {
-    public class HighlightResponse : MonoBehaviour, ISelectionResponse
+    [CreateAssetMenu(fileName = "Highlight Selection Response",menuName = "Expresso Bits/Interactions/Highlight Selection Response")]
+    public class HighlightResponse : SelectionResponse
     {
 
         [SerializeField] private Material[] highlightMaterials;
-
         private Dictionary<Renderer,Material[]> selectionMaterials = new Dictionary<Renderer, Material[]>();
 
-        public void OnSelect(IInteractable interactable)
+        public override void OnSelect(IInteractable interactable)
         {
             ChangeMaterials(interactable.Transform);
         }
 
-        public void OnDeselect(IInteractable interactable)
+        public override void OnDeselect(IInteractable interactable)
         {
             RestoreMaterials(interactable.Transform);
         }
@@ -60,9 +60,9 @@ namespace ExpressoBits.Interactions
         {
             return highlightMaterials[index % highlightMaterials.Length];
         }
+    
+
     }
-
-
 }
 
 

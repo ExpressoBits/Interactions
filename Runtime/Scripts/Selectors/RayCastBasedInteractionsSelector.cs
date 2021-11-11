@@ -2,16 +2,13 @@ using UnityEngine;
 
 namespace ExpressoBits.Interactions
 {
-    public class RayCastBasedInteractionsSelector : MonoBehaviour, ISelector
+    [CreateAssetMenu(fileName = "RayCast Based Selector",menuName = "Expresso Bits/Interactions/Raycast Based Selector")]
+    public class RayCastBasedInteractionsSelector : Selector
     {
-
-        public IInteractable Selection => selection;
-        
-        private IInteractable selection;
         [Range(0.1f,10f)]
         [SerializeField] private float maxDistanceToSelect = 1.5f;
 
-        public void Check(Ray ray)
+        public override void Check(Ray ray)
         {
             selection = null;
             if (Physics.Raycast(ray, out var hit, maxDistanceToSelect))
@@ -22,6 +19,5 @@ namespace ExpressoBits.Interactions
                 }
             }
         }
-
     }
 }
