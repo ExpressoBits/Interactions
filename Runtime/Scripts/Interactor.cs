@@ -23,6 +23,7 @@ namespace ExpressoBits.Interactions
         [SerializeField] private string defaultPreviewMessage = "for Interact";
         [SerializeField] private Selector selector;
         [SerializeField] private SelectionResponse[] selectionResponses;
+        [SerializeField] private float additionalDistanceToSelector = 0f;
 
         private void Awake()
         {
@@ -42,7 +43,7 @@ namespace ExpressoBits.Interactions
             }
             else
             {
-                selector.Check(rayProvider.CreateRay());
+                selector.Check(rayProvider.CreateRay(),additionalDistanceToSelector);
                 var selection = selector.Selection;
                 if (IsNewSelection(selection))
                 {
@@ -102,6 +103,11 @@ namespace ExpressoBits.Interactions
         private bool IsNewSelection(IInteractable selection)
         {
             return currentSelection != selection;
+        }
+
+        public void SetAdditionalDistanceForSelector(float additionalDistance)
+        {
+            this.additionalDistanceToSelector = additionalDistance;
         }
     }
 }
