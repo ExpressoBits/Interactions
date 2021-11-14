@@ -86,11 +86,11 @@ namespace ExpressoBits.Interactions
             {
                 OnInteract?.Invoke(currentSelection);
                 currentSelection?.Interact();
-                currentSelection = null;
+                //currentSelection = null;
             }
             else
             {
-                currentSelection = null;
+                //currentSelection = null;
             }
         }
 
