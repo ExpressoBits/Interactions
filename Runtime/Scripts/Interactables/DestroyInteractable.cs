@@ -1,8 +1,9 @@
+using Unity.Netcode;
 using UnityEngine;
 
 namespace ExpressoBits.Interactions.Interactables
 {
-    public class DestroyInteractable : MonoBehaviour, IInteractable, IPreviewInteract
+    public class DestroyInteractable : NetworkBehaviour, IInteractable, IPreviewInteract
     {
         private const string PriviewMessage = "for Destroy Object";
 
@@ -10,9 +11,15 @@ namespace ExpressoBits.Interactions.Interactables
 
         public Transform Transform => transform;
 
-        public void Interact()
+        public void Interact(Interactor interactor)
         {
-            Destroy(gameObject);
+            SpawnParticlesClientRpc();
+            NetworkObject.Despawn(gameObject);
+        }
+
+        [ClientRpc]
+        public void SpawnParticlesClientRpc()
+        {
             foreach(GameObject go in instantiateInDestroy)
             {
                 Instantiate(go,transform.position,transform.rotation);

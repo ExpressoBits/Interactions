@@ -8,7 +8,7 @@ namespace ExpressoBits.Interactions
     public interface IInteractable
     {
         Transform Transform { get; }
-        void Interact();
+        void Interact(Interactor interactor);
     }
 }
 
