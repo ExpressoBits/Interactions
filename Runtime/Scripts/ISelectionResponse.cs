@@ -4,7 +4,7 @@ namespace ExpressoBits.Interactions
 {
     public interface ISelectionResponse
     {
-        void OnSelect(IInteractable selection);
-        void OnDeselect(IInteractable selection);
+        void OnSelect(Transform selection);
+        void OnDeselect(Transform selection);
     }
 }

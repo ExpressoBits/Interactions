@@ -6,21 +6,21 @@ namespace ExpressoBits.Interactions.Responses
     public class SelectionResponseEvents : MonoBehaviour, ISelectionResponse
     {
 
-        public delegate void SelectionResponseEvent(IInteractable selection);
+        public delegate void SelectionResponseEvent(Transform selection);
 
         public SelectionResponseEvent OnSelectEvent;
         public SelectionResponseEvent OnDeselectEvent;
 
-        public UnityEvent<IInteractable> OnSelectUnityEvent;
-        public UnityEvent<IInteractable> OnDeselectUnityEvent;
+        public UnityEvent<Transform> OnSelectUnityEvent;
+        public UnityEvent<Transform> OnDeselectUnityEvent;
 
-        public void OnSelect(IInteractable interactable)
+        public void OnSelect(Transform interactable)
         {
             OnSelectEvent?.Invoke(interactable);
             OnSelectUnityEvent.Invoke(interactable);
         }
 
-        public void OnDeselect(IInteractable interactable)
+        public void OnDeselect(Transform interactable)
         {
             OnDeselectEvent?.Invoke(interactable);
             OnDeselectUnityEvent.Invoke(interactable);

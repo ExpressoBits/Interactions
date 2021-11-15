@@ -6,24 +6,27 @@ namespace ExpressoBits.Interactions
     public class Interactor : MonoBehaviour
     {
 
-        private IInteractable currentSelection;
+        private Transform currentSelection;
         private IRayProvider rayProvider;
         private ISelectionResponse[] responses;
         private bool requestInteraction;
+        private bool hasSelection;
 
-        public delegate void NewSelectionEvent(IInteractable newSelection);
+        public delegate void NewSelectionEvent(Transform newSelection);
         public delegate void PreviewEvent(string message);
 
         public NewSelectionEvent OnNewSelectionEvent;
         public static NewSelectionEvent OnAnyNewSelectionEvent;
         public static PreviewEvent OnAnyPreviewEvent;
 
-        public Action<IInteractable> OnInteract;
+        public Action<Transform> OnInteract;
 
         [SerializeField] private string defaultPreviewMessage = "for Interact";
         [SerializeField] private Selector selector;
         [SerializeField] private SelectionResponse[] selectionResponses;
         [SerializeField] private float additionalDistanceToSelector = 0f;
+
+        public bool HasSelection => hasSelection;
 
         private void Awake()
         {
@@ -36,38 +39,50 @@ namespace ExpressoBits.Interactions
 
         private void Update()
         {
+            selector.Check(rayProvider.CreateRay(),additionalDistanceToSelector);
+            var selection = selector.Selection;
+            if (IsNewSelection(selection))
+            {
+                UpdateSelection(selection);
+            }
+
+            CheckForSelection(selection);
+
             if (requestInteraction)
             {
                 InteractWithObject();
-                UpdateSelection(null);
             }
-            else
-            {
-                selector.Check(rayProvider.CreateRay(),additionalDistanceToSelector);
-                var selection = selector.Selection;
-                if (IsNewSelection(selection))
-                {
-                    UpdateSelection(selection);
-                }
-            }
+            
             requestInteraction = false;
         }
 
-        private void UpdateSelection(IInteractable selection)
+        private void CheckForSelection(Transform selection)
         {
-            if (currentSelection != null && currentSelection.Transform && currentSelection.Transform != null)
+            if(hasSelection && selection == null)
+            {
+                OnAnyNewSelectionEvent?.Invoke(null);
+                hasSelection = false;
+            }else
+            {
+                if(selection != null) hasSelection = true;
+            }
+        }
+
+        private void UpdateSelection(Transform selection)
+        {
+            if (currentSelection && currentSelection != null)
             {
                 foreach (var response in responses) response.OnDeselect(currentSelection);
                 foreach (var response in selectionResponses) response.OnDeselect(currentSelection);
             }
                 
-            if (selection != null && selection.Transform && selection.Transform != null)
+            if (selection && selection != null)
             {
                 foreach (var response in responses) response.OnSelect(selection);
                 foreach (var response in selectionResponses) response.OnSelect(selection);
             }
             
-            if (selection != null && selection.Transform.TryGetComponent(out IPreviewInteract preview))
+            if (selection != null && selection.TryGetComponent(out IPreviewInteract preview))
             {
                 OnAnyPreviewEvent?.Invoke(preview.PreviewMessage());
             }
@@ -75,22 +90,20 @@ namespace ExpressoBits.Interactions
             {
                 OnAnyPreviewEvent?.Invoke(defaultPreviewMessage);
             }
-            if (selection != null) OnNewSelectionEvent?.Invoke(selection);
+            OnNewSelectionEvent?.Invoke(selection);
             OnAnyNewSelectionEvent?.Invoke(selection);
             currentSelection = selection;
         }
 
         private void InteractWithObject()
         {
-            if (currentSelection != null && currentSelection.Transform && currentSelection.Transform != null)
+            if (currentSelection && currentSelection != null)
             {
                 OnInteract?.Invoke(currentSelection);
-                currentSelection?.Interact();
-                //currentSelection = null;
-            }
-            else
-            {
-                //currentSelection = null;
+                if(currentSelection.TryGetComponent(out IInteractable interactable))
+                {
+                    interactable.Interact();
+                }
             }
         }
 
@@ -100,7 +113,7 @@ namespace ExpressoBits.Interactions
             requestInteraction = true;
         }
 
-        private bool IsNewSelection(IInteractable selection)
+        private bool IsNewSelection(Transform selection)
         {
             return currentSelection != selection;
         }

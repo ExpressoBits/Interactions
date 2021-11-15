@@ -10,14 +10,14 @@ namespace ExpressoBits.Interactions
         [SerializeField] private Material[] highlightMaterials;
         private Dictionary<Renderer,Material[]> selectionMaterials = new Dictionary<Renderer, Material[]>();
 
-        public override void OnSelect(IInteractable interactable)
+        public override void OnSelect(Transform interactable)
         {
-            ChangeMaterials(interactable.Transform);
+            ChangeMaterials(interactable);
         }
 
-        public override void OnDeselect(IInteractable interactable)
+        public override void OnDeselect(Transform interactable)
         {
-            RestoreMaterials(interactable.Transform);
+            RestoreMaterials(interactable);
         }
 
         private void RestoreMaterials(Transform selection)

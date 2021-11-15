@@ -15,7 +15,7 @@ namespace ExpressoBits.Interactions
             {
                 if(hit.transform.TryGetComponent(out IInteractable interactable))
                 {
-                    this.selection = interactable;
+                    this.selection = hit.transform;
                 }
             }
         }
