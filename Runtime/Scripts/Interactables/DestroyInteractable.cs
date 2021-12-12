@@ -3,19 +3,13 @@ using UnityEngine;
 
 namespace ExpressoBits.Interactions.Interactables
 {
-    public class DestroyInteractable : NetworkBehaviour, IInteractable, IPreviewInteract
+    public class DestroyInteractable : InteractableAction
     {
-        private const string PriviewMessage = "for Destroy Object";
+        private const string PreviewMessageString = "for Destroy Object";
 
         public GameObject[] instantiateInDestroy;
 
         public Transform Transform => transform;
-
-        public void Interact(Interactor interactor)
-        {
-            SpawnParticlesClientRpc();
-            NetworkObject.Despawn(gameObject);
-        }
 
         [ClientRpc]
         public void SpawnParticlesClientRpc()
@@ -26,9 +20,12 @@ namespace ExpressoBits.Interactions.Interactables
             }
         }
 
-        public string PreviewMessage()
+        public override string PreviewMessage => PreviewMessageString;
+
+        public override void Action(Interactor interactor)
         {
-            return PriviewMessage;
+            SpawnParticlesClientRpc();
+            NetworkObject.Despawn(gameObject);
         }
     }
 }
