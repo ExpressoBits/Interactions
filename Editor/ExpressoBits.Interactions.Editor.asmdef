@@ -1,0 +1,18 @@
+{
+    "name": "ExpressoBits.Interactions.Editor",
+    "rootNamespace": "ExpressoBits.Interactions.Editor",
+    "references": [
+        "GUID:62927b49791a4304d9b8bd73dcc2bdc2"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

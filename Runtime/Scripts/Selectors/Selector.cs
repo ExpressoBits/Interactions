@@ -3,13 +3,11 @@ using UnityEngine;
 
 namespace ExpressoBits.Interactions
 {
-    public abstract class Selector : ScriptableObject
+    public abstract class Selector : MonoBehaviour
     {
-        public bool IsInteractable => isInteractable;
-        public Interactable Selection => selection;
-        public abstract void Check(Ray ray, float additionalDistance = 0f);
+        public Transform Selection => selection;
+        public abstract void Check();
 
-        protected Interactable selection;
-        protected bool isInteractable;
+        protected Transform selection;
     }
 }

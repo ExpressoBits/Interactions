@@ -3,31 +3,71 @@ using UnityEngine;
 
 namespace ExpressoBits.Interactions
 {
-    [CreateAssetMenu(fileName = "RayCast Based Selector", menuName = "Expresso Bits/Interactions/Raycast Based Selector")]
     public class RayCastBasedInteractionsSelector : Selector
     {
 
+        public Ray LastRay => lastRay;
+        public RaycastHit LastHit => lastHit;
+
         [Range(0.1f, 10f)]
         [SerializeField] private float maxDistanceToSelect = 1.5f;
+        [SerializeField] private float additionalDistanceToSelector = 0f;
 
-        public override void Check(Ray ray, float additionalDistance = 0)
+        #if UNITY_EDITOR
+        [SerializeField] private bool debugLine;
+        #endif
+
+        [SerializeField] private bool isCustomTransformRayOrigin;
+        [SerializeField] private Transform cameraTransform;
+        private float distance;
+
+        private RaycastHit lastHit;
+        private Ray lastRay;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="additionalDistance"></param>
+        public void SetAdditionalDistanceForSelector(float additionalDistance)
         {
-            
-            if (Physics.Raycast(ray, out var hit, maxDistanceToSelect + additionalDistance))
+            this.additionalDistanceToSelector = additionalDistance;
+        }
+
+        private Ray GetRay()
+        {
+            if(isCustomTransformRayOrigin)
             {
-                if (hit.transform.TryGetComponent(out NetworkObject networkObject))
-                {
-                    //if(hit.transform.Get)
-                    if (hit.transform.TryGetComponent(out Interactable interactable))
-                    {
-                        this.selection = interactable;
-                        this.isInteractable = true;
-                        return;
-                    }
-                }
+                if(cameraTransform == null) cameraTransform = Camera.main.transform;
+                distance = Vector3.Distance(cameraTransform.position,transform.position);
+                return new Ray(cameraTransform.position + cameraTransform.forward * distance/2f, cameraTransform.forward);
             }
-            isInteractable = false;
+            return Camera.main.ScreenPointToRay(Input.mousePosition);
+        }
+
+        public override void Check()
+        {   
+            lastRay = GetRay();
+
+            if (Physics.Raycast(lastRay, out var hit, maxDistanceToSelect + additionalDistanceToSelector))
+            {
+                selection = hit.transform;
+                lastHit = hit;
+                return;
+            }
             selection = null;
         }
+
+        #if UNITY_EDITOR
+        private void OnDrawGizmos()
+        {
+            if(debugLine)
+            {
+                Color lastColor = Gizmos.color;
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawRay(lastRay);
+                Gizmos.color = lastColor;
+            }
+        }
+        #endif
     }
 }

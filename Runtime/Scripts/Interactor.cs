@@ -5,14 +5,11 @@ using UnityEngine;
 
 namespace ExpressoBits.Interactions
 {
+    /// <summary>
+    /// Responsible for interacting with interactables, stores the interactable current selected with CurrentSelection
+    /// </summary>
     public class Interactor : NetworkBehaviour
     {
-
-        private Interactable currentSelection;
-        private IRayProvider rayProvider;
-        private ISelectionResponse[] responses;
-        private bool requestInteraction;
-        private bool hasSelection;
 
         public delegate void NewSelectionEvent(Interactable newSelection);
         public delegate void PreviewEvent(string message);
@@ -22,35 +19,55 @@ namespace ExpressoBits.Interactions
         public static PreviewEvent OnAnyPreviewEvent;
 
         public Action<Interactable> OnInteract;
+        public Action<Interactable> OnMoreOptions;
+        public Action OnCancelMoreOptionsInteract;
 
+        private Interactable currentSelection;
+        private ISelectionResponse[] responses;
+        private bool requestInteraction;
+        private bool requestMoreOptions;
+        private bool hasSelection;
         [SerializeField] private string defaultPreviewMessage = "for Interact";
         [SerializeField] private Selector selector;
         [SerializeField] private SelectionResponse[] selectionResponses;
-        [SerializeField] private float additionalDistanceToSelector = 0f;
+        [SerializeField] private Dictionary<ActionType, IActionInteractor> interactors = new Dictionary<ActionType, IActionInteractor>();
 
-        [SerializeField] private Dictionary<ActionType, Interactions.IActionInteractor> interactors = new Dictionary<ActionType, IActionInteractor>();
-
+        /// <summary>
+        /// Something was selected by ISelector
+        /// </summary>
         public bool HasSelection => hasSelection;
+        public Interactable CurrentSelection => currentSelection;
 
         private void Awake()
         {
-            if (TryGetComponent(out IRayProvider rayProvider))
-            {
-                this.rayProvider = rayProvider;
-            }
             responses = GetComponents<ISelectionResponse>();
         }
 
         private void Update()
         {
-            selector.Check(rayProvider.CreateRay(), additionalDistanceToSelector);
+            selector.Check();
             var selection = selector.Selection;
             if (IsNewSelection(selection))
             {
-                UpdateSelection(selection);
+                if(selection == null)
+                {
+                    UpdateSelection(null);
+                }
+                else if(selection.TryGetComponent(out Interactable interactable))
+                {
+                    UpdateSelection(interactable);
+                }
             }
 
-            CheckForSelection(selection);
+            CheckForSelection(currentSelection);
+
+            if (requestMoreOptions)
+            {
+                if (currentSelection && currentSelection != null)
+                {
+                    MoreOptions(currentSelection);
+                }
+            }
 
             if (requestInteraction)
             {
@@ -61,6 +78,13 @@ namespace ExpressoBits.Interactions
             }
 
             requestInteraction = false;
+            requestMoreOptions = false;
+        }
+        
+
+        private void MoreOptions(Interactable interactable)
+        {
+            OnMoreOptions?.Invoke(interactable);
         }
 
         #region Server Commands
@@ -73,17 +97,31 @@ namespace ExpressoBits.Interactions
                 {
                     if (targetObject.transform.TryGetComponent(out Interactable interactable))
                     {
-                        Interact(interactable);
+                        InteractWithAction(interactable,interactable.DefaultAction);
                     }
                 }
             }
-
         }
 
-        public void Interact(Interactable interactable)
+        [ServerRpc]
+        public void InteractServerRpc(NetworkObjectReference targetReference, int actionIndex)
+        {
+            if (targetReference.TryGet(out NetworkObject targetObject))
+            {
+                if (targetObject && targetObject != null)
+                {
+                    if (targetObject.transform.TryGetComponent(out Interactable interactable))
+                    {
+                        InteractWithAction(interactable,interactable.Actions[actionIndex]);
+                    }
+                }
+            }
+        }
+
+        public void InteractWithAction(Interactable interactable, InteractableAction action)
         {
             OnInteract?.Invoke(interactable);
-            ActionInteract(interactable, interactable.DefaultAction.ActionType);
+            ActionInteract(interactable, action.ActionType);
         }
 
         public void ActionInteract(Interactable interactable, ActionType actionType)
@@ -141,20 +179,24 @@ namespace ExpressoBits.Interactions
             }
         }
 
+        public void MoreOptions()
+        {
+            requestMoreOptions = true;
+        }
+
+        public void CancelMoreOptions()
+        {
+            OnCancelMoreOptionsInteract?.Invoke();
+        }
 
         public void Interact()
         {
             requestInteraction = true;
         }
 
-        private bool IsNewSelection(Interactable interactable)
+        private bool IsNewSelection(Transform interactable)
         {
-            return currentSelection != interactable;
-        }
-
-        public void SetAdditionalDistanceForSelector(float additionalDistance)
-        {
-            this.additionalDistanceToSelector = additionalDistance;
+            return (currentSelection == null && interactable != null ) || (currentSelection != null && currentSelection.transform != interactable);
         }
     }
 }

@@ -11,6 +11,7 @@ namespace ExpressoBits.Interactions
         
         public bool IsShowPreviewMessage => isShowPreviewMessage;
         public InteractableAction DefaultAction => defaultAction;
+        public InteractableAction[] Actions => actions;
 
         [SerializeField] private InteractableAction defaultAction;
         [SerializeField] private InteractableAction[] actions;
