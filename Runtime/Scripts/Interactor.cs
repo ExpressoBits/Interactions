@@ -73,7 +73,7 @@ namespace ExpressoBits.Interactions
             {
                 if (currentSelection && currentSelection != null)
                 {
-                    InteractServerRpc(currentSelection.NetworkObject);
+                    InteractServerRpc(currentSelection);
                 }
             }
 
@@ -89,32 +89,20 @@ namespace ExpressoBits.Interactions
 
         #region Server Commands
         [ServerRpc]
-        public void InteractServerRpc(NetworkObjectReference targetReference)
+        public void InteractServerRpc(NetworkBehaviourReference interactableReference)
         {
-            if (targetReference.TryGet(out NetworkObject targetObject))
+            if (interactableReference.TryGet(out Interactable interactable))
             {
-                if (targetObject && targetObject != null)
-                {
-                    if (targetObject.transform.TryGetComponent(out Interactable interactable))
-                    {
-                        InteractWithAction(interactable,interactable.DefaultAction);
-                    }
-                }
+                InteractWithAction(interactable,interactable.DefaultAction);
             }
         }
 
         [ServerRpc]
-        public void InteractServerRpc(NetworkObjectReference targetReference, int actionIndex)
+        public void InteractServerRpc(NetworkBehaviourReference interactableReference, int actionIndex)
         {
-            if (targetReference.TryGet(out NetworkObject targetObject))
+            if (interactableReference.TryGet(out Interactable interactable))
             {
-                if (targetObject && targetObject != null)
-                {
-                    if (targetObject.transform.TryGetComponent(out Interactable interactable))
-                    {
-                        InteractWithAction(interactable,interactable.Actions[actionIndex]);
-                    }
-                }
+                InteractWithAction(interactable,interactable.Actions[actionIndex]);
             }
         }
 
