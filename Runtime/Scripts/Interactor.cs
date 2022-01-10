@@ -45,15 +45,16 @@ namespace ExpressoBits.Interactions
 
         private void Update()
         {
+            if(!IsOwner) return;
             selector.Check();
             var selection = selector.Selection;
             if (IsNewSelection(selection))
             {
-                if(selection == null)
+                if (selection == null)
                 {
                     UpdateSelection(null);
                 }
-                else if(selection.TryGetComponent(out Interactable interactable))
+                else if (selection.TryGetComponent(out Interactable interactable))
                 {
                     UpdateSelection(interactable);
                 }
@@ -80,7 +81,14 @@ namespace ExpressoBits.Interactions
             requestInteraction = false;
             requestMoreOptions = false;
         }
-        
+
+        public void ClearSelection()
+        {
+            UpdateSelection(null);
+            OnAnyNewSelectionEvent?.Invoke(null);
+            hasSelection = false;
+        }
+
 
         private void MoreOptions(Interactable interactable)
         {
@@ -93,7 +101,7 @@ namespace ExpressoBits.Interactions
         {
             if (interactableReference.TryGet(out Interactable interactable))
             {
-                InteractWithAction(interactable,interactable.DefaultAction);
+                InteractWithAction(interactable, interactable.DefaultAction);
             }
         }
 
@@ -102,7 +110,7 @@ namespace ExpressoBits.Interactions
         {
             if (interactableReference.TryGet(out Interactable interactable))
             {
-                InteractWithAction(interactable,interactable.Actions[actionIndex]);
+                InteractWithAction(interactable, interactable.Actions[actionIndex]);
             }
         }
 
@@ -120,7 +128,6 @@ namespace ExpressoBits.Interactions
             }
         }
         #endregion
-
 
         private void CheckForSelection(Interactable selection)
         {
@@ -179,12 +186,14 @@ namespace ExpressoBits.Interactions
 
         public void Interact()
         {
+            if(!enabled) return;
+            if(!IsOwner) return;
             requestInteraction = true;
         }
 
         private bool IsNewSelection(Transform interactable)
         {
-            return (currentSelection == null && interactable != null ) || (currentSelection != null && currentSelection.transform != interactable);
+            return (currentSelection == null && interactable != null) || (currentSelection != null && currentSelection.transform != interactable);
         }
     }
 }

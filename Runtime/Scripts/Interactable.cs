@@ -1,3 +1,4 @@
+using System;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -12,11 +13,18 @@ namespace ExpressoBits.Interactions
         public bool IsShowPreviewMessage => isShowPreviewMessage;
         public InteractableAction DefaultAction => defaultAction;
         public InteractableAction[] Actions => actions;
+        public bool IsDraggable => isDraggable;
+        public Rigidbody DraggableRigidbody => draggableRigidbody;
 
         [SerializeField] private InteractableAction defaultAction;
         [SerializeField] private InteractableAction[] actions;
 
         [SerializeField] private bool isShowPreviewMessage;
+        [SerializeField] private bool isDraggable;
+        [SerializeField] private Rigidbody draggableRigidbody;
+
+        public Action OnDrag;
+        public Action OnDrop;
 
         public void DefaultInteract(Interactor interactor)
         {

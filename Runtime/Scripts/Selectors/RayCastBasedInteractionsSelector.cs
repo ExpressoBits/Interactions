@@ -8,6 +8,7 @@ namespace ExpressoBits.Interactions
 
         public Ray LastRay => lastRay;
         public RaycastHit LastHit => lastHit;
+        public Transform CameraTransform => cameraTransform;
 
         [Range(0.1f, 10f)]
         [SerializeField] private float maxDistanceToSelect = 1.5f;
