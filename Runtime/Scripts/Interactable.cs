@@ -1,5 +1,4 @@
 using System;
-using Unity.Netcode;
 using UnityEngine;
 
 namespace ExpressoBits.Interactions
@@ -7,7 +6,7 @@ namespace ExpressoBits.Interactions
     /// <summary>
     /// An interface to elements that will be interactable by the interactor
     /// </summary>
-    public class Interactable : NetworkBehaviour
+    public class Interactable : MonoBehaviour
     {
         
         public bool IsShowPreviewMessage => isShowPreviewMessage;

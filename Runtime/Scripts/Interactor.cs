@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Unity.Netcode;
 using UnityEngine;
 
 namespace ExpressoBits.Interactions
@@ -8,7 +7,7 @@ namespace ExpressoBits.Interactions
     /// <summary>
     /// Responsible for interacting with interactables, stores the interactable current selected with CurrentSelection
     /// </summary>
-    public class Interactor : NetworkBehaviour
+    public class Interactor : MonoBehaviour
     {
 
         public delegate void NewSelectionEvent(Interactable newSelection);
@@ -24,9 +23,9 @@ namespace ExpressoBits.Interactions
 
         private Interactable currentSelection;
         private ISelectionResponse[] responses;
-        private bool requestInteraction;
         private bool requestMoreOptions;
         private bool hasSelection;
+        private bool checkNewSelection = true;
         [SerializeField] private string defaultPreviewMessage = "for Interact";
         [SerializeField] private Selector selector;
         [SerializeField] private SelectionResponse[] selectionResponses;
@@ -45,7 +44,7 @@ namespace ExpressoBits.Interactions
 
         private void Update()
         {
-            if(!IsOwner) return;
+            if(!checkNewSelection) return;
             selector.Check();
             var selection = selector.Selection;
             if (IsNewSelection(selection))
@@ -70,15 +69,6 @@ namespace ExpressoBits.Interactions
                 }
             }
 
-            if (requestInteraction)
-            {
-                if (currentSelection && currentSelection != null)
-                {
-                    InteractServerRpc(currentSelection);
-                }
-            }
-
-            requestInteraction = false;
             requestMoreOptions = false;
         }
 
@@ -89,29 +79,19 @@ namespace ExpressoBits.Interactions
             hasSelection = false;
         }
 
-
         private void MoreOptions(Interactable interactable)
         {
             OnMoreOptions?.Invoke(interactable);
         }
 
-        #region Server Commands
-        [ServerRpc]
-        public void InteractServerRpc(NetworkBehaviourReference interactableReference)
+        public void Interact(Interactable interactable)
         {
-            if (interactableReference.TryGet(out Interactable interactable))
-            {
-                InteractWithAction(interactable, interactable.DefaultAction);
-            }
+            InteractWithAction(interactable, interactable.DefaultAction);
         }
 
-        [ServerRpc]
-        public void InteractServerRpc(NetworkBehaviourReference interactableReference, int actionIndex)
+        public void Interact(Interactable interactable, int actionIndex)
         {
-            if (interactableReference.TryGet(out Interactable interactable))
-            {
-                InteractWithAction(interactable, interactable.Actions[actionIndex]);
-            }
+            InteractWithAction(interactable, interactable.Actions[actionIndex]);
         }
 
         public void InteractWithAction(Interactable interactable, InteractableAction action)
@@ -127,7 +107,6 @@ namespace ExpressoBits.Interactions
                 interactor.Interact(actionType, interactable);
             }
         }
-        #endregion
 
         private void CheckForSelection(Interactable selection)
         {
@@ -186,14 +165,21 @@ namespace ExpressoBits.Interactions
 
         public void Interact()
         {
-            if(!enabled) return;
-            if(!IsOwner) return;
-            requestInteraction = true;
+            if (!enabled) return;
+            if (currentSelection && currentSelection != null)
+            {
+                Interact(currentSelection);
+            }
         }
 
         private bool IsNewSelection(Transform interactable)
         {
             return (currentSelection == null && interactable != null) || (currentSelection != null && currentSelection.transform != interactable);
+        }
+
+        public void SetCheckNewSelection(bool checkNewSelection)
+        {
+            this.checkNewSelection = checkNewSelection;
         }
     }
 }

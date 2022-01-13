@@ -1,10 +1,9 @@
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace ExpressoBits.Interactions
 {
-    public abstract class InteractableAction : NetworkBehaviour
+    public abstract class InteractableAction : MonoBehaviour
     {
         public ActionType ActionType => actionType;
         public abstract void Action(Interactor interactor);

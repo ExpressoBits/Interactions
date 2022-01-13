@@ -1,4 +1,3 @@
-using Unity.Netcode;
 using UnityEngine;
 
 namespace ExpressoBits.Interactions.Interactables
@@ -11,8 +10,7 @@ namespace ExpressoBits.Interactions.Interactables
 
         public Transform Transform => transform;
 
-        [ClientRpc]
-        public void SpawnParticlesClientRpc()
+        public void SpawnParticles()
         {
             foreach(GameObject go in instantiateInDestroy)
             {
@@ -24,8 +22,8 @@ namespace ExpressoBits.Interactions.Interactables
 
         public override void Action(Interactor interactor)
         {
-            SpawnParticlesClientRpc();
-            NetworkObject.Despawn(gameObject);
+            SpawnParticles();
+            Destroy(gameObject);
         }
     }
 }
