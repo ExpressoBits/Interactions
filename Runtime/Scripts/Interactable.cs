@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace ExpressoBits.Interactions
@@ -8,32 +9,40 @@ namespace ExpressoBits.Interactions
     /// </summary>
     public class Interactable : MonoBehaviour
     {
-        
+
         public bool IsShowPreviewMessage => isShowPreviewMessage;
-        public InteractableAction DefaultAction => defaultAction;
-        public InteractableAction[] Actions => actions;
+        public InteractableAction[] InteractableActions => interactableActions;
+        public List<ActionType> ActionTypes => actionTypes;
         public bool IsDraggable => isDraggable;
         public Rigidbody DraggableRigidbody => draggableRigidbody;
+        public string Name => interactableName;
+        public Dictionary<ActionType,InteractableAction> InteractableActionTypeDictionary
+        {
+            get
+            {
+                if(interactableActionsCache == null)
+                {
+                    interactableActionsCache = new Dictionary<ActionType, InteractableAction>();
+                    foreach (var interactableAction in interactableActions)
+                    {
+                        interactableActionsCache.Add(interactableAction.ActionType, interactableAction);
+                    }
+                }
+                return interactableActionsCache;
+            }
+        }
 
-        [SerializeField] private InteractableAction defaultAction;
-        [SerializeField] private InteractableAction[] actions;
-
+        [SerializeField] private InteractableAction[] interactableActions;
         [SerializeField] private bool isShowPreviewMessage;
         [SerializeField] private bool isDraggable;
         [SerializeField] private Rigidbody draggableRigidbody;
+        [SerializeField] private List<ActionType> actionTypes;
+        [SerializeField] private string interactableName;
+
+        private Dictionary<ActionType, InteractableAction> interactableActionsCache;
 
         public Action OnDrag;
         public Action OnDrop;
-
-        public void DefaultInteract(Interactor interactor)
-        {
-            defaultAction.Action(interactor);
-        }
-
-        public string PreviewMessage()
-        {
-            return DefaultAction.PreviewMessage;
-        }
     }
 }
 
